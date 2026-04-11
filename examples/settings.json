@@ -1,0 +1,31 @@
+{
+  "// Minimal — just directory and context bar": "",
+  "statusLine_minimal": {
+    "type": "command",
+    "command": "bash ~/Development/Tools/statusline/statusline.sh --segments directory,context_bar"
+  },
+
+  "// Full monitoring — all key metrics": "",
+  "statusLine_full": {
+    "type": "command",
+    "command": "bash ~/Development/Tools/statusline/statusline.sh --segments directory,context_bar,model,cost,rate_limits --rate-style dot --theme default"
+  },
+
+  "// Developer — context + code changes": "",
+  "statusLine_developer": {
+    "type": "command",
+    "command": "bash ~/Development/Tools/statusline/statusline.sh --segments directory,context_bar,model,lines_changed,session_time"
+  },
+
+  "// Plain text — no icons, no color": "",
+  "statusLine_plain": {
+    "type": "command",
+    "command": "bash ~/Development/Tools/statusline/statusline.sh --segments directory,context_bar,model --no-icons --no-color"
+  },
+
+  "// Copy one of the above as 'statusLine' to use it:": "",
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/Development/Tools/statusline/statusline.sh --segments directory,context_bar,model,cost --theme default"
+  }
+}
