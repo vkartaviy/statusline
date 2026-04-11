@@ -29,24 +29,15 @@ segment_directory() {
   local display="$rel"
   local max_len=25
 
-  # Collapse: keep first 2 + last 1, skip middle
-  if [ "$count" -gt 3 ] || [ ${#display} -gt "$max_len" ]; then
+  # Collapse: always keep first 2 + last 1
+  if [ "$count" -gt 3 ]; then
     local last="${rel##*/}"
-    local rest="${rel%/*}"        # strip last
-    local first="${rest%%/*}"     # first component
-    local second_rest="${rest#*/}"
-    local second="${second_rest%%/*}"  # second component
+    local rest="${rel%/*}"
+    local first="${rest%%/*}"
+    local second="${rest#*/}"
+    second="${second%%/*}"
 
-    if [ "$first" != "$second" ] && [ "$count" -gt 2 ]; then
-      display="${first}/${second}/…/${last}"
-    else
-      display="${first}/…/${last}"
-    fi
-
-    # If still too long, drop to first/…/last
-    if [ ${#display} -gt "$max_len" ]; then
-      display="${first}/…/${last}"
-    fi
+    display="${first}/${second}/…/${last}"
   fi
 
   printf '%b%s%s%b' "$_THEME_DIR" "$_ICON_DIR" "$display" "$_CLR_RESET"
