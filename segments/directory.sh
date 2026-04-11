@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
-# directory.sh — current directory relative to project, collapsed if too long
+# directory.sh — current directory relative to project, smart collapse
+
+# Check if a directory has multiple subdirectories
+_has_siblings() {
+  local dir="$1"
+  [ -d "$dir" ] || return 1
+  # Temporarily enable globbing (statusline.sh uses set -f)
+  set +f
+  local count=0 entry
+  for entry in "$dir"/*/; do
+    [ -d "$entry" ] || continue
+    count=$((count + 1))
+    [ "$count" -gt 1 ] && { set -f; return 0; }
+  done
+  set -f
+  return 1
+}
 
 segment_directory() {
   [ -z "$_CC_CWD" ] && return 1
@@ -22,7 +38,7 @@ segment_directory() {
   local display="$rel"
   local max_len=30
 
-  # Only collapse if path is too long — short paths stay fully visible
+  # Only collapse if path is too long
   if [ ${#display} -gt "$max_len" ]; then
     # Count components
     local count=1 tmp="$rel"
@@ -32,14 +48,28 @@ segment_directory() {
     done
 
     if [ "$count" -gt 2 ]; then
-      # Keep first 2 + last 1
       local last="${rel##*/}"
       local rest="${rel%/*}"
       local first="${rest%%/*}"
       local second="${rest#*/}"
       second="${second%%/*}"
 
-      display="${first}/${second}/…/${last}"
+      # Check siblings at each level to decide where to collapse
+      # If a level has siblings → keep it (disambiguation needed)
+      local third="${rest#*/}"  # strip first
+      third="${third#*/}"       # strip second
+      third="${third%%/*}"      # get third component
+
+      if [ -n "$project" ] && [ -n "$third" ] && \
+         _has_siblings "${project}/${first}"; then
+        # 3rd level has siblings → keep first 3 + last 1
+        display="${first}/${second}/${third}/…/${last}"
+        # If 3rd == last, no need for …
+        [ "$third" = "$last" ] && display="${first}/${second}/${third}"
+      else
+        # No siblings → safe to collapse after first 2
+        display="${first}/${second}/…/${last}"
+      fi
     fi
   fi
 
