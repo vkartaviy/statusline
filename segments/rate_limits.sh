@@ -1,12 +1,45 @@
 #!/usr/bin/env bash
 # rate_limits.sh — API rate limit usage (4 sub-styles)
 
-# Color by percentage threshold
+# Compute projected usage at end of window (pace-based)
+# Returns projected percentage (0-999, clamped)
+_rate_pace() {
+  local used_pct="$1"
+  local resets_at="$2"
+  local window="$3"  # window size in seconds (5h=18000, 7d=604800)
+
+  # Can't compute pace without reset time
+  if [ "$resets_at" -le 0 ]; then
+    printf '%d' "$used_pct"
+    return
+  fi
+
+  local remaining=$((_RATE_NOW - resets_at))
+  # remaining is negative (resets_at is in the future)
+  remaining=$((resets_at - _RATE_NOW))
+  [ "$remaining" -le 0 ] && { printf '%d' "$used_pct"; return; }
+
+  local elapsed=$((window - remaining))
+  # Just started or no time elapsed — can't project
+  if [ "$elapsed" -le 0 ]; then
+    printf '%d' "$used_pct"
+    return
+  fi
+
+  # projected = used_pct * window / elapsed
+  # Use bigger multiplier to avoid integer truncation
+  local projected=$((used_pct * window / elapsed))
+  [ "$projected" -gt 100 ] && projected=100
+
+  printf '%d' "$projected"
+}
+
+# Color by pace (projected usage at end of window)
 _rate_color() {
   local pct="$1"
-  if [ "$pct" -lt 50 ]; then
+  if [ "$pct" -lt 70 ]; then
     printf '%s' "$_THEME_RATE_OK"
-  elif [ "$pct" -lt 80 ]; then
+  elif [ "$pct" -lt 90 ]; then
     printf '%s' "$_THEME_RATE_WARN"
   else
     printf '%s' "$_THEME_RATE_CRIT"
@@ -18,9 +51,7 @@ _rate_countdown() {
   local resets_at="$1"
   [ "$resets_at" -le 0 ] && return 1
 
-  local now
-  now=$(date +%s)
-  local remaining=$((resets_at - now))
+  local remaining=$((resets_at - _RATE_NOW))
   [ "$remaining" -le 0 ] && { printf '0m'; return; }
 
   local days=$((remaining / 86400))
@@ -39,15 +70,16 @@ _rate_countdown() {
 # Build a small bar (8 chars wide) showing REMAINING capacity
 _rate_bar() {
   local used_pct="$1"
+  local pace="${2:-$used_pct}"  # pace for color, defaults to used_pct
   local remain=$((100 - used_pct))
   [ "$remain" -lt 0 ] && remain=0
   local width=8
   local filled=$((remain * width / 100))
   local empty=$((width - filled))
 
-  # Color by used percentage (high usage = danger)
+  # Color by pace (projected usage at end of window)
   local color
-  color=$(_rate_color "$used_pct")
+  color=$(_rate_color "$pace")
 
   local bar=""
   local i
@@ -70,19 +102,27 @@ segment_rate_limits() {
   local d7="${_CC_RATE_7D:--1}"
   [ "$h5" = "-1" ] && [ "$d7" = "-1" ] && return 1
 
+  # Single date call for the whole segment
+  _RATE_NOW=$(date +%s)
+
   # Truncate to integer for display and comparison
   local h5_int="${h5%.*}"
   local d7_int="${d7%.*}"
+
+  # Compute pace (projected usage at end of window)
+  local h5_pace d7_pace
+  h5_pace=$(_rate_pace "$h5_int" "${_CC_RATE_5H_RESET:--1}" 18000)   # 5h = 18000s
+  d7_pace=$(_rate_pace "$d7_int" "${_CC_RATE_7D_RESET:--1}" 604800)  # 7d = 604800s
 
   case "$_CFG_RATE_STYLE" in
     compact)
       local parts=""
       if [ "$h5_int" -ge 0 ]; then
-        local c5; c5=$(_rate_color "$h5_int")
+        local c5; c5=$(_rate_color "$h5_pace")
         parts=$(printf '%b5h:%d%%%b' "$c5" "$h5_int" "$_CLR_RESET")
       fi
       if [ "$d7_int" -ge 0 ]; then
-        local c7; c7=$(_rate_color "$d7_int")
+        local c7; c7=$(_rate_color "$d7_pace")
         [ -n "$parts" ] && parts="${parts}$(printf ' %b·%b ' "$_THEME_LABEL" "$_CLR_RESET")"
         parts="${parts}$(printf '%b7d:%d%%%b' "$c7" "$d7_int" "$_CLR_RESET")"
       fi
@@ -90,20 +130,20 @@ segment_rate_limits() {
       ;;
 
     dot)
-      # Single dot colored by worst (highest) percentage
+      # Single dot colored by worst pace
       local worst=0
-      [ "$h5_int" -gt "$worst" ] && worst="$h5_int"
-      [ "$d7_int" -gt "$worst" ] && worst="$d7_int"
+      [ "$h5_pace" -gt "$worst" ] && worst="$h5_pace"
+      [ "$d7_pace" -gt "$worst" ] && worst="$d7_pace"
       local color
       color=$(_rate_color "$worst")
       printf '%b●%b' "$color" "$_CLR_RESET"
       ;;
 
     full)
-      # Bar + countdown
+      # Bar (remaining) + % + countdown, colored by pace
       local parts=""
       if [ "$h5_int" -ge 0 ]; then
-        parts=$(printf '%b5h%b %s' "$_THEME_LABEL" "$_CLR_RESET" "$(_rate_bar "$h5_int")")
+        parts=$(printf '%b5h%b %s' "$_THEME_LABEL" "$_CLR_RESET" "$(_rate_bar "$h5_int" "$h5_pace")")
         local cd5
         if cd5=$(_rate_countdown "$_CC_RATE_5H_RESET"); then
           parts="${parts}$(printf ' %b%s%s%b' "$_THEME_LABEL" "$_ICON_RESET" "$cd5" "$_CLR_RESET")"
@@ -111,7 +151,7 @@ segment_rate_limits() {
       fi
       if [ "$d7_int" -ge 0 ]; then
         [ -n "$parts" ] && parts="${parts}$(printf ' %b·%b ' "$_THEME_LABEL" "$_CLR_RESET")"
-        parts="${parts}$(printf '%b7d%b %s' "$_THEME_LABEL" "$_CLR_RESET" "$(_rate_bar "$d7_int")")"
+        parts="${parts}$(printf '%b7d%b %s' "$_THEME_LABEL" "$_CLR_RESET" "$(_rate_bar "$d7_int" "$d7_pace")")"
         local cd7
         if cd7=$(_rate_countdown "$_CC_RATE_7D_RESET"); then
           parts="${parts}$(printf ' %b%s%s%b' "$_THEME_LABEL" "$_ICON_RESET" "$cd7" "$_CLR_RESET")"

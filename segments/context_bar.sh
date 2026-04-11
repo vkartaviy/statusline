@@ -42,5 +42,5 @@ segment_context_bar() {
   printf '%b%s%b%s%b %b%d%%%b' \
     "$color" "$bar" \
     "$_THEME_BAR_EMPTY" "$empty_part" "$_CLR_RESET" \
-    "$_THEME_PCT" "$pct" "$_CLR_RESET"
+    "$color" "$pct" "$_CLR_RESET"
 }
