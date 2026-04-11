@@ -35,13 +35,22 @@ Or manually — add to `~/.claude/settings.json`:
 }
 ```
 
-### Nerd Font (optional)
+### Nerd Font (recommended)
 
 For `--icons nerd` (default), install a [Nerd Font](https://www.nerdfonts.com/) and set it as your terminal font:
 
 ```bash
+# Pick one:
 brew install --cask font-jetbrains-mono-nerd-font
+brew install --cask font-hack-nerd-font
+brew install --cask font-fira-code-nerd-font
 ```
+
+Then set the font in your terminal (e.g. Warp: Settings → Appearance → Terminal font).
+
+> **Tip:** Choose the regular variant (e.g. "JetBrains Mono Nerd Font"), not the Mono variant.
+> The Mono version forces icons into a single-width cell, making them appear tiny.
+> The regular version renders icons at their natural width.
 
 Without a Nerd Font, use `--icons unicode` or `--icons none`.
 
