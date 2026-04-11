@@ -80,7 +80,7 @@ Config hierarchy: CLI flags > config file > built-in defaults.
 | Segment | Output | Description |
 |---------|--------|-------------|
 | `project` | `statusline` | Project root name |
-| `directory` | `lib/utils` | Current path relative to project (hidden in root) |
+| `directory` | `apps/web/src` | Path relative to project, smart collapse |
 | `context_bar` | `■■■■■■□□□□□□□□ 42%` | Context window usage bar |
 | `context_pct` | `42%` | Context percentage only |
 | `model` | `Opus 4.6 (1M context)` | Model display name |
@@ -91,8 +91,17 @@ Config hierarchy: CLI flags > config file > built-in defaults.
 | `session_time` | `12m 34s` | Session duration |
 | `lines_changed` | `+156 -23` | Lines added/removed |
 
-All segments read only JSON from Claude Code stdin — no shell commands, no filesystem access.
+All segments read JSON from Claude Code stdin. The `directory` segment also checks the filesystem to detect sibling directories for smart path collapsing.
 Context bar auto-adapts to both 200K and 1M context windows.
+
+### Directory collapse
+
+The `directory` segment shows your path relative to the project root. Long paths are collapsed smartly:
+
+- **Short paths** shown fully: `apps/web/src`
+- **Long paths** with siblings: `apps/server/src/…/auth` (keeps 3 components for disambiguation)
+- **Long paths** without siblings: `lib/core/…/auth` (safe to collapse after 2)
+- **In project root**: hidden (the `project` segment handles it)
 
 ## Themes
 

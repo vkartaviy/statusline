@@ -54,8 +54,8 @@ CONFIG FILE
 SEGMENTS
   project         Project root name
                   Example: statusline
-  directory       Current path relative to project (hidden in root)
-                  Example: lib/utils
+  directory       Path relative to project, smart collapse for long paths
+                  Example: apps/web/src
   context_bar     Context window usage bar with gradient colors
                   Example: ■■■■■■□□□□□□□□ 42%
   context_pct     Context window percentage (number only)
