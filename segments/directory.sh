@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# directory.sh — current directory relative to project, collapsed if deep/long
+# directory.sh — current directory relative to project, collapsed if too long
 
 segment_directory() {
   [ -z "$_CC_CWD" ] && return 1
@@ -19,25 +19,28 @@ segment_directory() {
   # In project root — hide (project segment handles it)
   [ -z "$rel" ] && return 1
 
-  # Count path components
-  local count=1 tmp="$rel"
-  while [ "${tmp#*/}" != "$tmp" ]; do
-    count=$((count + 1))
-    tmp="${tmp#*/}"
-  done
-
   local display="$rel"
-  local max_len=25
+  local max_len=30
 
-  # Collapse: always keep first 2 + last 1
-  if [ "$count" -gt 3 ]; then
-    local last="${rel##*/}"
-    local rest="${rel%/*}"
-    local first="${rest%%/*}"
-    local second="${rest#*/}"
-    second="${second%%/*}"
+  # Only collapse if path is too long — short paths stay fully visible
+  if [ ${#display} -gt "$max_len" ]; then
+    # Count components
+    local count=1 tmp="$rel"
+    while [ "${tmp#*/}" != "$tmp" ]; do
+      count=$((count + 1))
+      tmp="${tmp#*/}"
+    done
 
-    display="${first}/${second}/…/${last}"
+    if [ "$count" -gt 2 ]; then
+      # Keep first 2 + last 1
+      local last="${rel##*/}"
+      local rest="${rel%/*}"
+      local first="${rest%%/*}"
+      local second="${rest#*/}"
+      second="${second%%/*}"
+
+      display="${first}/${second}/…/${last}"
+    fi
   fi
 
   printf '%b%s%s%b' "$_THEME_DIR" "$_ICON_DIR" "$display" "$_CLR_RESET"
