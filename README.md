@@ -3,7 +3,7 @@
 Configurable statusline for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Single bash script, modular segments, multiple themes.
 
 ```
- Tapelet/src | ■■■■■■□□□□□□□□□□□□□□ 32% |  Opus | $1.23
+Tools/statusline | ■■■■■■□□□□□□□□□□□□□□ 32% | Opus 4.6 (1M context) | $1.23
 ```
 
 ## Features
@@ -80,10 +80,10 @@ Config hierarchy: CLI flags > config file > built-in defaults.
 
 | Segment | Output | Description |
 |---------|--------|-------------|
-| `directory` | `Tapelet/src` | Last 2 path components |
+| `directory` | `Tools/statusline` | Last 2 path components |
 | `context_bar` | `■■■■■■□□□□□□□□ 42%` | Context window usage bar |
 | `context_pct` | `42%` | Context percentage only |
-| `model` | `Opus` | Model display name |
+| `model` | `Opus 4.6 (1M context)` | Model display name |
 | `cost` | `$1.23` | Session cost |
 | `rate_limits` | `5h:23% · 7d:41%` | API rate limits |
 | `vim_mode` | `NORMAL` | Vim mode indicator |
@@ -107,9 +107,9 @@ Context bar auto-adapts to both 200K and 1M context windows.
 
 | `--icons` | Requires | Example |
 |-----------|----------|---------|
-| `nerd` | Nerd Font | ` Tapelet/src` |
-| `unicode` | Any font | `› Tapelet/src` |
-| `none` | — | `Tapelet/src` |
+| `nerd` | Nerd Font | ` Tools/statusline` |
+| `unicode` | Any font | `› Tools/statusline` |
+| `none` | — | `Tools/statusline` |
 
 **Custom icons:** create a file in `icons/` (see `icons/example.sh`) and use `--icons <name>`.
 
