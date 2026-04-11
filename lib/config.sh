@@ -83,7 +83,7 @@ cc_load_config() {
       _ICON_WORKTREE="$(printf '\xee\x9c\xa5') "   # U+E725 git-branch
       _ICON_TIME="$(printf '\xef\x80\x97') "       # U+F017 clock
       _ICON_RESET="$(printf '\xee\xab\x92') "       # U+EAD2
-      _ICON_PROJECT="$(printf '\xef\x8a\x92') "   # U+F292 terminal
+      _ICON_PROJECT="$(printf '\xee\xad\x84') "   # U+EB44 bracket
       ;;
     unicode)
       _ICON_DIR="› "
