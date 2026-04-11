@@ -115,13 +115,15 @@ Context bar auto-adapts to both 200K and 1M context windows.
 
 ## Rate Limit Styles
 
-| `--rate-style` | Output |
-|----------------|--------|
-| `compact` | `5h:23% · 7d:41%` |
-| `dot` | `●` (colored by worst limit) |
-| `full` | `5h ■□□□□□□□ ⟳2h · 7d ■■■□□□□□ ⟳4d` |
+| `--rate-style` | Output | Description |
+|----------------|--------|-------------|
+| `compact` | `5h:23% · 7d:41%` | Percentage used |
+| `dot` | `●` | Single colored dot |
+| `full` | `5h ■■■■■■□□ 77% ⟳2h · 7d ■■■■□□□□ 59% ⟳4d` | Remaining bar + countdown |
 
-Color thresholds: green <50%, yellow 50-80%, red >80%.
+**Pace-based coloring:** colors reflect projected usage at end of the window, not just current percentage. Using 50% in the first hour of a 5-hour window shows red (on pace to exceed limit), while 80% used with 30 minutes left shows yellow (window almost over, pace is fine).
+
+Thresholds (by projected usage): green <70%, yellow 70-90%, red >90%.
 
 ## Preview
 

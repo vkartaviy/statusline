@@ -88,9 +88,12 @@ BAR STYLES (--bar-style)
   ascii           ######------
 
 RATE LIMIT STYLES (--rate-style)
-  compact         5h:23% · 7d:41%           (default)
-  dot             ● (colored by worst limit)
-  full            5h ■■□□□□□□ ⟳2h14m 7d ■■■□□□□□ ⟳4d
+  compact         5h:23% · 7d:41%                        (default)
+  dot             ● (colored by worst pace)
+  full            5h ■■■■■■□□ 77% ⟳2h · 7d ■■■■□□□□ 59% ⟳4d
+
+  Colors are pace-based: projected usage at end of window.
+  Green <70%, yellow 70-90%, red >90% projected.
 
 EXAMPLES
   Minimal:
