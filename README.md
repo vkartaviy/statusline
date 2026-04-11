@@ -6,11 +6,12 @@ Configurable statusline for [Claude Code](https://docs.anthropic.com/en/docs/cla
 
 ## Features
 
-- **10 segments** — directory, context bar, context %, model, cost, rate limits, vim mode, worktree, session time, lines changed
+- **11 segments** — project, directory, context bar, context %, model, cost, rate limits, vim mode, worktree, session time, lines changed
 - **4 themes** — default (gradient), minimal, neon, monochrome
 - **4 bar styles** — block `■□`, shade `█░`, dot `●○`, ascii `#-`
-- **3 rate limit styles** — compact, dot, full (bar + countdown)
+- **3 rate limit styles** — compact, dot, full (3-zone pace bar + countdown)
 - **3 icon sets** — nerd (Nerd Font), unicode, none — plus custom icon sets
+- **Pace-based rate coloring** — colors reflect projected usage, not just current percentage
 - **Fast** — single `jq` call, rest is bash arithmetic (~30ms)
 - **Compatible** — macOS bash 3.2+, no dependencies beyond `jq`
 
@@ -28,7 +29,7 @@ Or manually — add to `~/.claude/settings.json`:
 {
   "statusLine": {
     "type": "command",
-    "command": "bash /path/to/statusline.sh --segments directory,context_bar,model,cost --theme default"
+    "command": "bash /path/to/statusline.sh --segments project,directory,context_bar,cost,rate_limits --theme neon --icons nerd --rate-style full"
   }
 }
 ```
@@ -78,14 +79,15 @@ Config hierarchy: CLI flags > config file > built-in defaults.
 
 | Segment | Output | Description |
 |---------|--------|-------------|
-| `directory` | `Tools/statusline` | Last 2 path components |
+| `project` | `statusline` | Project root name |
+| `directory` | `lib/utils` | Current path relative to project (hidden in root) |
 | `context_bar` | `■■■■■■□□□□□□□□ 42%` | Context window usage bar |
 | `context_pct` | `42%` | Context percentage only |
 | `model` | `Opus 4.6 (1M context)` | Model display name |
-| `cost` | `$1.23` | Session cost |
-| `rate_limits` | `5h:23% · 7d:41%` | API rate limits |
+| `cost` | `$1.23` | Session cost (rounded to 2 decimals) |
+| `rate_limits` | `5h:23% · 7d:41%` | API rate limits (see rate styles) |
 | `vim_mode` | `NORMAL` | Vim mode indicator |
-| `worktree` | `feature-xyz` | Git worktree name |
+| `worktree` | `feature-xyz` | Git worktree name (hidden if not in worktree) |
 | `session_time` | `12m 34s` | Session duration |
 | `lines_changed` | `+156 -23` | Lines added/removed |
 
@@ -98,16 +100,16 @@ Context bar auto-adapts to both 200K and 1M context windows.
 |-------|-------------|
 | `default` | Green → yellow → red gradient |
 | `minimal` | Dim/subtle colors |
-| `neon` | Bold vivid 256-color |
+| `neon` | Vivid 256-color, slightly muted |
 | `monochrome` | No ANSI codes |
 
 ## Icons
 
 | `--icons` | Requires | Example |
 |-----------|----------|---------|
-| `nerd` | Nerd Font | ` Tools/statusline` |
-| `unicode` | Any font | `› Tools/statusline` |
-| `none` | — | `Tools/statusline` |
+| `nerd` | Nerd Font | `statusline` |
+| `unicode` | Any font | `◆ statusline` |
+| `none` | — | `statusline` |
 
 **Custom icons:** create a file in `icons/` (see `icons/example.sh`) and use `--icons <name>`.
 
@@ -130,6 +132,7 @@ The `full` bar has three zones:
 - `▪` — **at risk**: projected to be consumed at current pace
 - `□` — **used**: already consumed
 
+Pace activates after 20% of the window has elapsed and usage exceeds 20%.
 Thresholds (by projected usage): green <70%, yellow 70-90%, red >90%.
 
 ## Preview
@@ -146,7 +149,7 @@ bash preview.sh --theme neon  # Preview one theme
 {
   "statusLine": {
     "type": "command",
-    "command": "bash statusline.sh --segments directory,context_bar"
+    "command": "bash statusline.sh --segments project,context_bar"
   }
 }
 ```
@@ -156,7 +159,7 @@ bash preview.sh --theme neon  # Preview one theme
 {
   "statusLine": {
     "type": "command",
-    "command": "bash statusline.sh --segments directory,context_bar,model,cost,rate_limits --rate-style dot"
+    "command": "bash statusline.sh --segments project,directory,context_bar,cost,rate_limits --theme neon --icons nerd --rate-style full"
   }
 }
 ```
@@ -166,7 +169,7 @@ bash preview.sh --theme neon  # Preview one theme
 {
   "statusLine": {
     "type": "command",
-    "command": "bash statusline.sh --segments directory,context_bar,model,lines_changed,session_time"
+    "command": "bash statusline.sh --segments project,directory,context_bar,lines_changed,session_time"
   }
 }
 ```
@@ -186,12 +189,12 @@ bash preview.sh --theme neon  # Preview one theme
 `~/.config/claude-statusline/config`:
 
 ```
-SEGMENTS=directory,context_bar,model
-THEME=default
+SEGMENTS=project,directory,context_bar,cost,rate_limits
+THEME=neon
 BAR_WIDTH=20
 BAR_STYLE=block
 SEPARATOR= |
-RATE_STYLE=compact
+RATE_STYLE=full
 ICONS=nerd
 ```
 

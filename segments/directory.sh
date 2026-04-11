@@ -20,7 +20,7 @@ segment_directory() {
   # In project root — hide (project segment handles it)
   [ -z "$rel" ] && return 1
 
-  # Collapse if more than 2 components
+  # Collapse if more than 3 components
   local count=1 tmp="$rel"
   while [ "${tmp#*/}" != "$tmp" ]; do
     count=$((count + 1))
@@ -28,7 +28,7 @@ segment_directory() {
   done
 
   local display
-  if [ "$count" -le 2 ]; then
+  if [ "$count" -le 3 ]; then
     display="$rel"
   else
     local first="${rel%%/*}"

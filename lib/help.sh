@@ -52,24 +52,26 @@ CONFIG FILE
   Priority: CLI flags > config file > built-in defaults
 
 SEGMENTS
-  directory       Project directory (last 2 path components)
-                  Example:  Tapelet/src
+  project         Project root name
+                  Example: statusline
+  directory       Current path relative to project (hidden in root)
+                  Example: lib/utils
   context_bar     Context window usage bar with gradient colors
-                  Example: ■■■■■■■■■■■■□□□□□□□□□□□□□□□□□□ 42%
+                  Example: ■■■■■■□□□□□□□□ 42%
   context_pct     Context window percentage (number only)
                   Example: 42%
   model           Model display name
-                  Example:  Opus
-  cost            Session cost in USD
-                  Example:  $1.23
+                  Example: Opus 4.6 (1M context)
+  cost            Session cost in USD (rounded)
+                  Example: $1.23
   rate_limits     API rate limit usage (see --rate-style)
                   Example: 5h:23% · 7d:41%
   vim_mode        Vim mode indicator
                   Example: NORMAL
-  worktree        Git worktree name
-                  Example:  feature-xyz
+  worktree        Git worktree name (hidden if not in worktree)
+                  Example: feature-xyz
   session_time    Session duration
-                  Example:  12m 34s
+                  Example: 12m 34s
   lines_changed   Lines added/removed
                   Example: +156 -23
 
