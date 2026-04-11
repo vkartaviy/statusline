@@ -7,6 +7,7 @@ _THEME_BAR_HIGH="\033[2;33m"     # dim yellow
 _THEME_BAR_CRIT="\033[2;31m"     # dim red
 _THEME_BAR_EMPTY="\033[2;90m"    # dim gray
 _THEME_PCT="\033[2;37m"          # dim white
+_THEME_PROJECT="\033[0;35m"     # magenta
 _THEME_DIR="\033[2;37m"          # dim white
 _THEME_MODEL="\033[2;37m"        # dim white
 _THEME_COST="\033[2;37m"         # dim white
