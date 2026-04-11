@@ -74,7 +74,7 @@ cc_load_config() {
   esac
 
   # ── Resolve icon characters from style ──
-  _ICON_DIR="" _ICON_MODEL="" _ICON_COST="" _ICON_WORKTREE="" _ICON_TIME="" _ICON_RESET="⟳"
+  _ICON_DIR="" _ICON_MODEL="" _ICON_COST="" _ICON_WORKTREE="" _ICON_TIME="" _ICON_RESET="⟳" _ICON_PROJECT=""
   case "$_CFG_ICON_STYLE" in
     nerd)
       _ICON_DIR="$(printf '\xef\x81\xbc') "       # U+F07C folder-open
@@ -83,6 +83,7 @@ cc_load_config() {
       _ICON_WORKTREE="$(printf '\xee\x9c\xa5') "   # U+E725 git-branch
       _ICON_TIME="$(printf '\xef\x80\x97') "       # U+F017 clock
       _ICON_RESET="$(printf '\xee\xab\x92') "       # U+EAD2
+      _ICON_PROJECT="$(printf '\xef\x84\xa1') "   # U+F121 code
       ;;
     unicode)
       _ICON_DIR="› "
@@ -91,6 +92,7 @@ cc_load_config() {
       _ICON_WORKTREE="⎇ "
       _ICON_TIME="◷ "
       _ICON_RESET="◷"
+      _ICON_PROJECT="◆ "
       ;;
     none) ;;
     *)

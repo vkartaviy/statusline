@@ -20,6 +20,7 @@ cc_parse_input() {
   local parsed
   parsed=$(printf '%s' "$_CC_RAW" | jq -r '[
     .workspace.current_dir // "",
+    .workspace.project_dir // "",
     .workspace.git_worktree // "",
     .model.display_name // "",
     (.context_window.current_usage.input_tokens // 0),
@@ -38,7 +39,7 @@ cc_parse_input() {
   ] | map(tostring) | join("\u001f")' 2>/dev/null) || return 1
 
   IFS="$_US" read -r \
-    _CC_CWD _CC_WORKTREE _CC_MODEL \
+    _CC_CWD _CC_PROJECT_DIR _CC_WORKTREE _CC_MODEL \
     _CC_INPUT_TOKENS _CC_CACHE_CREATE _CC_CACHE_READ \
     _CC_CTX_SIZE _CC_COST _CC_DURATION_MS \
     _CC_LINES_ADDED _CC_LINES_REMOVED \
