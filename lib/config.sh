@@ -79,7 +79,7 @@ cc_load_config() {
     nerd)
       _ICON_DIR="$(printf '\xef\x81\xbc') "       # U+F07C folder-open
       _ICON_MODEL="$(printf '\xef\x8b\x9b') "     # U+F2DB microchip
-      _ICON_COST=""
+      _ICON_COST="$(printf '\xee\xb7\xa8') "       # U+EDE8
       _ICON_WORKTREE="$(printf '\xee\x9c\xa5') "   # U+E725 git-branch
       _ICON_TIME="$(printf '\xef\x80\x97') "       # U+F017 clock
       _ICON_RESET="$(printf '\xee\xab\x92') "       # U+EAD2
