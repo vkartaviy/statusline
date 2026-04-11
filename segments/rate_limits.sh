@@ -67,32 +67,52 @@ _rate_countdown() {
   fi
 }
 
-# Build a small bar (8 chars wide) showing REMAINING capacity
+# Build a 3-zone bar (8 chars wide) showing remaining capacity + pace
+# Zone 1 (filled): safe — will remain even at current pace
+# Zone 2 (pace):   at risk — projected to be consumed at current pace
+# Zone 3 (empty):  already used
 _rate_bar() {
   local used_pct="$1"
-  local pace="${2:-$used_pct}"  # pace for color, defaults to used_pct
+  local pace="${2:-$used_pct}"  # projected usage at end of window
+  local width=8
+
+  # Remaining blocks (current)
   local remain=$((100 - used_pct))
   [ "$remain" -lt 0 ] && remain=0
-  local width=8
-  local filled=$((remain * width / 100))
-  local empty=$((width - filled))
 
-  # Color by pace (projected usage at end of window)
+  # Projected remaining at end of window
+  local proj_remain=$((100 - pace))
+  [ "$proj_remain" -lt 0 ] && proj_remain=0
+  [ "$proj_remain" -gt "$remain" ] && proj_remain="$remain"
+
+  # Three zones in blocks
+  local safe_blocks=$((proj_remain * width / 100))
+  local total_remain_blocks=$((remain * width / 100))
+  local pace_blocks=$((total_remain_blocks - safe_blocks))
+  local used_blocks=$((width - total_remain_blocks))
+
   local color
   color=$(_rate_color "$pace")
 
-  local bar=""
-  local i
-  for ((i=0; i<filled; i++)); do
+  local bar="" i
+  for ((i=0; i<safe_blocks; i++)); do
     bar="${bar}${_CFG_BAR_FILLED}"
   done
+
+  local pace_part=""
+  for ((i=0; i<pace_blocks; i++)); do
+    pace_part="${pace_part}${_CFG_BAR_PACE}"
+  done
+
   local empty_part=""
-  for ((i=0; i<empty; i++)); do
+  for ((i=0; i<used_blocks; i++)); do
     empty_part="${empty_part}${_CFG_BAR_EMPTY}"
   done
 
-  printf '%b%s%b%s%b %b%d%%%b' \
-    "$color" "$bar" "$_THEME_BAR_EMPTY" "$empty_part" "$_CLR_RESET" \
+  printf '%b%s%b%s%b%s%b %b%d%%%b' \
+    "$color" "$bar" \
+    "$_THEME_BAR_MED" "$pace_part" \
+    "$_THEME_BAR_EMPTY" "$empty_part" "$_CLR_RESET" \
     "$color" "$remain" "$_CLR_RESET"
 }
 

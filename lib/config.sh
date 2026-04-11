@@ -66,11 +66,11 @@ cc_load_config() {
 
   # ── Resolve bar characters from style ──
   case "$_CFG_BAR_STYLE" in
-    block) _CFG_BAR_FILLED="■"; _CFG_BAR_EMPTY="□" ;;
-    shade) _CFG_BAR_FILLED="█"; _CFG_BAR_EMPTY="░" ;;
-    dot)   _CFG_BAR_FILLED="●"; _CFG_BAR_EMPTY="○" ;;
-    ascii) _CFG_BAR_FILLED="#"; _CFG_BAR_EMPTY="-" ;;
-    *)     _CFG_BAR_FILLED="■"; _CFG_BAR_EMPTY="□" ;;
+    block) _CFG_BAR_FILLED="■"; _CFG_BAR_PACE="▪"; _CFG_BAR_EMPTY="□" ;;
+    shade) _CFG_BAR_FILLED="█"; _CFG_BAR_PACE="▓"; _CFG_BAR_EMPTY="░" ;;
+    dot)   _CFG_BAR_FILLED="●"; _CFG_BAR_PACE="◐"; _CFG_BAR_EMPTY="○" ;;
+    ascii) _CFG_BAR_FILLED="#"; _CFG_BAR_PACE="="; _CFG_BAR_EMPTY="-" ;;
+    *)     _CFG_BAR_FILLED="■"; _CFG_BAR_PACE="▪"; _CFG_BAR_EMPTY="□" ;;
   esac
 
   # ── Resolve icon characters from style ──
