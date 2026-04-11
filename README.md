@@ -2,9 +2,7 @@
 
 Configurable statusline for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Single bash script, modular segments, multiple themes.
 
-```
-Tools/statusline | ■■■■■■□□□□□□□□□□□□□□ 32% | Opus 4.6 (1M context) | $1.23
-```
+![preview](preview.png)
 
 ## Features
 
