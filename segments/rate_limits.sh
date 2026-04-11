@@ -9,7 +9,7 @@ _rate_pace() {
   local window="$3"  # window size in seconds (5h=18000, 7d=604800)
 
   # Low usage — pace is noise, just return raw percentage
-  if [ "$used_pct" -lt 10 ]; then
+  if [ "$used_pct" -lt 20 ]; then
     printf '%d' "$used_pct"
     return
   fi
@@ -26,8 +26,9 @@ _rate_pace() {
   [ "$remaining" -le 0 ] && { printf '%d' "$used_pct"; return; }
 
   local elapsed=$((window - remaining))
-  # Just started or no time elapsed — can't project
-  if [ "$elapsed" -le 0 ]; then
+  # Need at least 20% of window elapsed for reliable projection
+  local min_elapsed=$((window / 5))
+  if [ "$elapsed" -le "$min_elapsed" ]; then
     printf '%d' "$used_pct"
     return
   fi
