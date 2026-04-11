@@ -23,14 +23,16 @@ OPTIONS
   --theme NAME          Color theme: default, minimal, neon, monochrome
                         Default: default
   --bar-width N         Bar width in characters (context_bar + rate bar)
-                        Default: 30
+                        Default: 20
   --bar-style STYLE     Bar characters: block, shade, dot, ascii
                         Default: block
   --separator STR       String between segments
                         Default: " | "
-  --rate-style STYLE    Rate limits display: compact, bar, dot, full
+  --rate-style STYLE    Rate limits display: compact, dot, full
                         Default: compact
-  --no-icons            Disable Nerd Font glyphs
+  --icons STYLE         Icon set: nerd, unicode, none (or custom from icons/)
+                        Default: nerd
+  --no-icons            Alias for --icons none
   --no-color            Disable all ANSI (forces monochrome theme)
   --config PATH         Config file path
                         Default: ~/.config/claude-statusline/config
@@ -41,11 +43,11 @@ CONFIG FILE
   Format (one KEY=VALUE per line):
     SEGMENTS=directory,context_bar,model
     THEME=default
-    BAR_WIDTH=30
+    BAR_WIDTH=20
     BAR_STYLE=block
     SEPARATOR= |
     RATE_STYLE=compact
-    ICONS=1
+    ICONS=nerd
 
   Priority: CLI flags > config file > built-in defaults
 
@@ -87,9 +89,8 @@ BAR STYLES (--bar-style)
 
 RATE LIMIT STYLES (--rate-style)
   compact         5h:23% · 7d:41%           (default)
-  bar             5h ■■□□□□□□ 7d ■■■□□□□□
   dot             ● (colored by worst limit)
-  full            5h:23% ⟳2h14m · 7d:41% ⟳4d
+  full            5h ■■□□□□□□ ⟳2h14m 7d ■■■□□□□□ ⟳4d
 
 EXAMPLES
   Minimal:

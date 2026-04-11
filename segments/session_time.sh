@@ -19,8 +19,5 @@ segment_session_time() {
     display="${secs}s"
   fi
 
-  local icon=""
-  [ "$_CFG_ICONS" -eq 1 ] && icon=" "
-
-  printf '%b%s%s%b' "$_THEME_TIME" "$icon" "$display" "$_CLR_RESET"
+  printf '%b%s%s%b' "$_THEME_TIME" "$_ICON_TIME" "$display" "$_CLR_RESET"
 }

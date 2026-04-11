@@ -17,8 +17,5 @@ segment_directory() {
     display="$base"
   fi
 
-  local icon=""
-  [ "$_CFG_ICONS" -eq 1 ] && icon=" "
-
-  printf '%b%s%s%b' "$_THEME_DIR" "$icon" "$display" "$_CLR_RESET"
+  printf '%b%s%s%b' "$_THEME_DIR" "$_ICON_DIR" "$display" "$_CLR_RESET"
 }

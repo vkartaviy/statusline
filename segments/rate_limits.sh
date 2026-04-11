@@ -84,18 +84,6 @@ segment_rate_limits() {
       printf '%s' "$parts"
       ;;
 
-    bar)
-      local parts=""
-      if [ "$h5_int" -ge 0 ]; then
-        parts=$(printf '%b5h%b %s' "$_THEME_LABEL" "$_CLR_RESET" "$(_rate_bar "$h5_int")")
-      fi
-      if [ "$d7_int" -ge 0 ]; then
-        [ -n "$parts" ] && parts="${parts} "
-        parts="${parts}$(printf '%b7d%b %s' "$_THEME_LABEL" "$_CLR_RESET" "$(_rate_bar "$d7_int")")"
-      fi
-      printf '%s' "$parts"
-      ;;
-
     dot)
       # Single dot colored by worst (highest) percentage
       local worst=0
@@ -107,22 +95,21 @@ segment_rate_limits() {
       ;;
 
     full)
+      # Bar + countdown
       local parts=""
       if [ "$h5_int" -ge 0 ]; then
-        local c5; c5=$(_rate_color "$h5_int")
-        parts=$(printf '%b5h:%d%%%b' "$c5" "$h5_int" "$_CLR_RESET")
+        parts=$(printf '%b5h%b %s' "$_THEME_LABEL" "$_CLR_RESET" "$(_rate_bar "$h5_int")")
         local cd5
         if cd5=$(_rate_countdown "$_CC_RATE_5H_RESET"); then
-          parts="${parts}$(printf ' %b⟳%s%b' "$_THEME_LABEL" "$cd5" "$_CLR_RESET")"
+          parts="${parts}$(printf ' %b%s%s%b' "$_THEME_LABEL" "$_ICON_RESET" "$cd5" "$_CLR_RESET")"
         fi
       fi
       if [ "$d7_int" -ge 0 ]; then
-        local c7; c7=$(_rate_color "$d7_int")
         [ -n "$parts" ] && parts="${parts}$(printf ' %b·%b ' "$_THEME_LABEL" "$_CLR_RESET")"
-        parts="${parts}$(printf '%b7d:%d%%%b' "$c7" "$d7_int" "$_CLR_RESET")"
+        parts="${parts}$(printf '%b7d%b %s' "$_THEME_LABEL" "$_CLR_RESET" "$(_rate_bar "$d7_int")")"
         local cd7
         if cd7=$(_rate_countdown "$_CC_RATE_7D_RESET"); then
-          parts="${parts}$(printf ' %b⟳%s%b' "$_THEME_LABEL" "$cd7" "$_CLR_RESET")"
+          parts="${parts}$(printf ' %b%s%s%b' "$_THEME_LABEL" "$_ICON_RESET" "$cd7" "$_CLR_RESET")"
         fi
       fi
       printf '%s' "$parts"

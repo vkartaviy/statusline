@@ -6,9 +6,5 @@ segment_cost() {
   [ -z "$_CC_COST" ] && return 1
   [ "$_CC_COST" = "0" ] && return 1
 
-  local icon=""
-  [ "$_CFG_ICONS" -eq 1 ] && icon=" "
-
-  # Format: $X.XX — jq already gives us the decimal
-  printf '%b%s$%s%b' "$_THEME_COST" "$icon" "$_CC_COST" "$_CLR_RESET"
+  printf '%b%s$%s%b' "$_THEME_COST" "$_ICON_COST" "$_CC_COST" "$_CLR_RESET"
 }

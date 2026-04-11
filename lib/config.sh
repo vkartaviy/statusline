@@ -5,11 +5,11 @@ cc_load_config() {
   # ── Built-in defaults ──
   _CFG_SEGMENTS="directory,context_bar"
   _CFG_THEME="default"
-  _CFG_BAR_WIDTH=30
+  _CFG_BAR_WIDTH=20
   _CFG_BAR_STYLE="block"
   _CFG_SEPARATOR=" | "
   _CFG_RATE_STYLE="compact"
-  _CFG_ICONS=1
+  _CFG_ICON_STYLE="nerd"
   _CFG_NO_COLOR=0
   _CFG_CONFIG="${HOME}/.config/claude-statusline/config"
   _CFG_SHOW_HELP=0
@@ -41,7 +41,7 @@ cc_load_config() {
         BAR_STYLE)  _CFG_BAR_STYLE="$val" ;;
         SEPARATOR)  _CFG_SEPARATOR="$val" ;;
         RATE_STYLE) _CFG_RATE_STYLE="$val" ;;
-        ICONS)      _CFG_ICONS="$val" ;;
+        ICONS)      _CFG_ICON_STYLE="$val" ;;
       esac
     done < "$_CFG_CONFIG"
   fi
@@ -55,7 +55,8 @@ cc_load_config() {
       --bar-style)  _CFG_BAR_STYLE="$2"; shift 2 ;;
       --separator)  _CFG_SEPARATOR="$2"; shift 2 ;;
       --rate-style) _CFG_RATE_STYLE="$2"; shift 2 ;;
-      --no-icons)   _CFG_ICONS=0; shift ;;
+      --icons)      _CFG_ICON_STYLE="$2"; shift 2 ;;
+      --no-icons)   _CFG_ICON_STYLE="none"; shift ;;
       --no-color)   _CFG_NO_COLOR=1; shift ;;
       --config)     shift 2 ;;  # already handled
       --help)       _CFG_SHOW_HELP=1; shift ;;
@@ -70,6 +71,33 @@ cc_load_config() {
     dot)   _CFG_BAR_FILLED="●"; _CFG_BAR_EMPTY="○" ;;
     ascii) _CFG_BAR_FILLED="#"; _CFG_BAR_EMPTY="-" ;;
     *)     _CFG_BAR_FILLED="■"; _CFG_BAR_EMPTY="□" ;;
+  esac
+
+  # ── Resolve icon characters from style ──
+  _ICON_DIR="" _ICON_MODEL="" _ICON_COST="" _ICON_WORKTREE="" _ICON_TIME="" _ICON_RESET="⟳"
+  case "$_CFG_ICON_STYLE" in
+    nerd)
+      _ICON_DIR="$(printf '\xef\x81\xbc') "       # U+F07C folder-open
+      _ICON_MODEL="$(printf '\xef\x8b\x9b') "     # U+F2DB microchip
+      _ICON_COST=""
+      _ICON_WORKTREE="$(printf '\xee\x9c\xa5') "   # U+E725 git-branch
+      _ICON_TIME="$(printf '\xef\x80\x97') "       # U+F017 clock
+      _ICON_RESET="$(printf '\xee\xab\x92') "       # U+EAD2
+      ;;
+    unicode)
+      _ICON_DIR="› "
+      _ICON_MODEL=""
+      _ICON_COST=""
+      _ICON_WORKTREE="⎇ "
+      _ICON_TIME="◷ "
+      _ICON_RESET="◷"
+      ;;
+    none) ;;
+    *)
+      # Custom: source from icons/<name>.sh
+      local _icons_file="${_SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/icons/${_CFG_ICON_STYLE}.sh"
+      [ -f "$_icons_file" ] && . "$_icons_file"
+      ;;
   esac
 
   # ── No-color forces monochrome theme ──
