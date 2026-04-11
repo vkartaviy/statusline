@@ -26,8 +26,11 @@ _mock_json() {
   local input_tokens="${2:-65000}"
   local rate_5h="${3:-23}"
   local rate_7d="${4:-41}"
-  local reset_5h=$(($(date +%s) + 8040))   # ~2h14m
-  local reset_7d=$(($(date +%s) + 345600)) # ~4d
+  local reset_5h_offset="${5:-8040}"    # seconds until reset (default ~2h14m)
+  local reset_7d_offset="${6:-345600}"  # default ~4d
+  local now=$(date +%s)
+  local reset_5h=$((now + reset_5h_offset))
+  local reset_7d=$((now + reset_7d_offset))
 
   printf '{"model":{"display_name":"Opus"},"workspace":{"current_dir":"/Users/vk/Dev/Tapelet/src","git_worktree":"feature-xyz"},"context_window":{"current_usage":{"input_tokens":%d,"cache_creation_input_tokens":10000,"cache_read_input_tokens":5000},"context_window_size":%d},"cost":{"total_cost_usd":1.23,"total_duration_ms":754000,"total_lines_added":156,"total_lines_removed":23},"rate_limits":{"five_hour":{"used_percentage":%s,"resets_at":%d},"seven_day":{"used_percentage":%s,"resets_at":%d}},"vim":{"mode":"NORMAL"}}' \
     "$input_tokens" "$ctx_size" "$rate_5h" "$reset_5h" "$rate_7d" "$reset_7d"
@@ -81,10 +84,22 @@ done
 
 # Rate Limit Styles
 _header "Rate Limit Styles"
-for style in compact bar dot full; do
+for style in compact dot full; do
   printf '  %-13s' "$style:"
   _run "$(_mock_json)" --segments rate_limits --rate-style "$style"
 done
+
+# Pace visualization (full rate style)
+_header "Pace (full rate style)"
+printf '  %-20s' "Low pace (safe):"
+# 23% used, 2h left of 5h → pace ~38%
+_run "$(_mock_json 200000 65000 23 41 7200 345600)" --segments rate_limits --rate-style full
+printf '  %-20s' "Moderate pace:"
+# 40% used, 2.5h left of 5h → pace ~80%
+_run "$(_mock_json 200000 65000 40 30 9000 518400)" --segments rate_limits --rate-style full
+printf '  %-20s' "High pace (danger):"
+# 50% used, 4h left of 5h → pace 250%
+_run "$(_mock_json 200000 65000 50 10 14400 561600)" --segments rate_limits --rate-style full
 
 # All Segments
 _header "All Segments"

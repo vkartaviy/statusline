@@ -119,9 +119,18 @@ Context bar auto-adapts to both 200K and 1M context windows.
 |----------------|--------|-------------|
 | `compact` | `5h:23% · 7d:41%` | Percentage used |
 | `dot` | `●` | Single colored dot |
-| `full` | `5h ■■■■■■□□ 77% ⟳2h · 7d ■■■■□□□□ 59% ⟳4d` | Remaining bar + countdown |
+| `full` | `5h ■■■■▪▪□□ 77% ⟳2h · 7d ■■▪▪□□□□ 59% ⟳4d` | 3-zone bar + countdown |
 
-**Pace-based coloring:** colors reflect projected usage at end of the window, not just current percentage. Using 50% in the first hour of a 5-hour window shows red (on pace to exceed limit), while 80% used with 30 minutes left shows yellow (window almost over, pace is fine).
+### Pace-based coloring
+
+Colors reflect **projected usage** at end of the window, not just current percentage:
+- 50% used in the first hour of a 5h window → red (on pace to exceed limit)
+- 80% used with 30 minutes left → yellow (window almost over, pace is fine)
+
+The `full` bar has three zones:
+- `■` — **safe**: will remain even at current pace
+- `▪` — **at risk**: projected to be consumed at current pace
+- `□` — **used**: already consumed
 
 Thresholds (by projected usage): green <70%, yellow 70-90%, red >90%.
 
