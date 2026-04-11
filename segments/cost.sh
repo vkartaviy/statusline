@@ -6,5 +6,20 @@ segment_cost() {
   [ -z "$_CC_COST" ] && return 1
   [ "$_CC_COST" = "0" ] && return 1
 
-  printf '%b%s$%s%b' "$_THEME_COST" "$_ICON_COST" "$_CC_COST" "$_CLR_RESET"
+  # Ensure two decimal places (jq drops trailing zeros)
+  local formatted
+  case "$_CC_COST" in
+    *.*.*) formatted="$_CC_COST" ;;  # shouldn't happen
+    *.*)
+      local decimals="${_CC_COST#*.}"
+      if [ ${#decimals} -lt 2 ]; then
+        formatted="${_CC_COST}0"
+      else
+        formatted="$_CC_COST"
+      fi
+      ;;
+    *) formatted="${_CC_COST}.00" ;;
+  esac
+
+  printf '%b%s$%s%b' "$_THEME_COST" "$_ICON_COST" "$formatted" "$_CLR_RESET"
 }

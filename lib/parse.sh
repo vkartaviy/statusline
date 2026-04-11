@@ -26,7 +26,7 @@ cc_parse_input() {
     (.context_window.current_usage.cache_creation_input_tokens // 0),
     (.context_window.current_usage.cache_read_input_tokens // 0),
     (.context_window.context_window_size // 0),
-    (.cost.total_cost_usd // 0),
+    ((.cost.total_cost_usd // 0) * 100 | round / 100),
     (.cost.total_duration_ms // 0),
     (.cost.total_lines_added // 0),
     (.cost.total_lines_removed // 0),
