@@ -8,6 +8,12 @@ _rate_pace() {
   local resets_at="$2"
   local window="$3"  # window size in seconds (5h=18000, 7d=604800)
 
+  # Low usage — pace is noise, just return raw percentage
+  if [ "$used_pct" -lt 10 ]; then
+    printf '%d' "$used_pct"
+    return
+  fi
+
   # Can't compute pace without reset time
   if [ "$resets_at" -le 0 ]; then
     printf '%d' "$used_pct"
