@@ -36,15 +36,18 @@ _rate_countdown() {
   fi
 }
 
-# Build a small bar (8 chars wide) for bar style
+# Build a small bar (8 chars wide) showing REMAINING capacity
 _rate_bar() {
-  local pct="$1"
+  local used_pct="$1"
+  local remain=$((100 - used_pct))
+  [ "$remain" -lt 0 ] && remain=0
   local width=8
-  local filled=$((pct * width / 100))
+  local filled=$((remain * width / 100))
   local empty=$((width - filled))
 
+  # Color by used percentage (high usage = danger)
   local color
-  color=$(_rate_color "$pct")
+  color=$(_rate_color "$used_pct")
 
   local bar=""
   local i
@@ -56,7 +59,9 @@ _rate_bar() {
     empty_part="${empty_part}${_CFG_BAR_EMPTY}"
   done
 
-  printf '%b%s%b%s%b' "$color" "$bar" "$_THEME_BAR_EMPTY" "$empty_part" "$_CLR_RESET"
+  printf '%b%s%b%s%b %b%d%%%b' \
+    "$color" "$bar" "$_THEME_BAR_EMPTY" "$empty_part" "$_CLR_RESET" \
+    "$color" "$remain" "$_CLR_RESET"
 }
 
 segment_rate_limits() {
