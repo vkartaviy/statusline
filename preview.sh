@@ -21,19 +21,22 @@ while [ $# -gt 0 ]; do
 done
 
 # ── Mock JSON generator ──
+# Args: ctx_size input_tokens rate_5h rate_7d reset_5h_offset reset_7d_offset project_dir current_dir
 _mock_json() {
   local ctx_size="${1:-200000}"
   local input_tokens="${2:-65000}"
   local rate_5h="${3:-23}"
   local rate_7d="${4:-41}"
-  local reset_5h_offset="${5:-8040}"    # seconds until reset (default ~2h14m)
-  local reset_7d_offset="${6:-345600}"  # default ~4d
+  local reset_5h_offset="${5:-8040}"
+  local reset_7d_offset="${6:-345600}"
+  local project_dir="${7:-/Users/vk/Dev/statusline}"
+  local current_dir="${8:-$project_dir/segments}"
   local now=$(date +%s)
   local reset_5h=$((now + reset_5h_offset))
   local reset_7d=$((now + reset_7d_offset))
 
-  printf '{"model":{"display_name":"Opus"},"workspace":{"current_dir":"/Users/vk/Dev/Tapelet/src","git_worktree":"feature-xyz"},"context_window":{"current_usage":{"input_tokens":%d,"cache_creation_input_tokens":10000,"cache_read_input_tokens":5000},"context_window_size":%d},"cost":{"total_cost_usd":1.23,"total_duration_ms":754000,"total_lines_added":156,"total_lines_removed":23},"rate_limits":{"five_hour":{"used_percentage":%s,"resets_at":%d},"seven_day":{"used_percentage":%s,"resets_at":%d}},"vim":{"mode":"NORMAL"}}' \
-    "$input_tokens" "$ctx_size" "$rate_5h" "$reset_5h" "$rate_7d" "$reset_7d"
+  printf '{"model":{"display_name":"Opus 4.6"},"workspace":{"project_dir":"%s","current_dir":"%s","git_worktree":"feature-xyz"},"context_window":{"current_usage":{"input_tokens":%d,"cache_creation_input_tokens":10000,"cache_read_input_tokens":5000},"context_window_size":%d},"cost":{"total_cost_usd":13.50,"total_duration_ms":754000,"total_lines_added":156,"total_lines_removed":23},"rate_limits":{"five_hour":{"used_percentage":%s,"resets_at":%d},"seven_day":{"used_percentage":%s,"resets_at":%d}},"vim":{"mode":"NORMAL"}}' \
+    "$project_dir" "$current_dir" "$input_tokens" "$ctx_size" "$rate_5h" "$reset_5h" "$rate_7d" "$reset_7d"
 }
 
 _header() {
@@ -48,20 +51,26 @@ _run() {
 # ── Preview ──
 
 if [ -n "$_PREVIEW_THEME" ]; then
-  # Single theme preview
   _header "Theme: $_PREVIEW_THEME"
-  local segs="${_PREVIEW_SEGMENTS:-directory,context_bar,model,cost,rate_limits,vim_mode,worktree,session_time,lines_changed}"
-  _run "$(_mock_json)" --segments "$segs" --theme "$_PREVIEW_THEME"
+  segs="${_PREVIEW_SEGMENTS:-project,directory,context_bar,cost,rate_limits}"
+  _run "$(_mock_json)" --segments "$segs" --theme "$_PREVIEW_THEME" --rate-style full
   exit 0
 fi
 
-segs="${_PREVIEW_SEGMENTS:-directory,context_bar,model,cost}"
+segs="${_PREVIEW_SEGMENTS:-project,directory,context_bar,cost}"
 
 # Themes
 _header "Themes"
 for theme in default minimal neon monochrome; do
   printf '  %-13s' "$theme:"
   _run "$(_mock_json)" --segments "$segs" --theme "$theme"
+done
+
+# Icon Sets
+_header "Icon Sets"
+for icons in nerd unicode none; do
+  printf '  %-13s' "$icons:"
+  _run "$(_mock_json)" --segments project,directory,cost,worktree,session_time --theme neon --icons "$icons"
 done
 
 # Context Window sizes
@@ -82,6 +91,17 @@ for style in block shade dot ascii; do
   _run "$(_mock_json)" --segments context_bar --bar-style "$style"
 done
 
+# Directory Collapse (smart)
+_header "Directory Collapse"
+printf '  %-20s' "In root:"
+_run "$(_mock_json 200000 65000 23 41 8040 345600 /Users/vk/Dev/statusline /Users/vk/Dev/statusline)" --segments project,directory --theme neon
+printf '  %-20s' "Short path:"
+_run "$(_mock_json 200000 65000 23 41 8040 345600 /Users/vk/Dev/myapp /Users/vk/Dev/myapp/src)" --segments project,directory --theme neon
+printf '  %-20s' "3 levels (fits):"
+_run "$(_mock_json 200000 65000 23 41 8040 345600 /Users/vk/Dev/myapp /Users/vk/Dev/myapp/apps/web/src)" --segments project,directory --theme neon
+printf '  %-20s' "Long (collapsed):"
+_run "$(_mock_json 200000 65000 23 41 8040 345600 /Users/vk/Dev/myapp /Users/vk/Dev/myapp/packages/authentication/src/middleware)" --segments project,directory --theme neon
+
 # Rate Limit Styles
 _header "Rate Limit Styles"
 for style in compact dot full; do
@@ -89,21 +109,22 @@ for style in compact dot full; do
   _run "$(_mock_json)" --segments rate_limits --rate-style "$style"
 done
 
-# Pace visualization (full rate style)
-_header "Pace (full rate style)"
+# Pace visualization (full rate style, 3-zone bar)
+# 5h window = 18000s. Pace = used% × 5h / elapsed. Requires elapsed > 20% and used > 20%.
+_header "Pace (full rate style — 3-zone bar: ■ safe, ▪ at-risk, □ used)"
+# Low: 30% used, 3h elapsed (60%) → pace = 30*5/3 = 50% → green
 printf '  %-20s' "Low pace (safe):"
-# 23% used, 2h left of 5h → pace ~38%
-_run "$(_mock_json 200000 65000 23 41 7200 345600)" --segments rate_limits --rate-style full
+_run "$(_mock_json 200000 65000 30 25 7200 518400)" --segments rate_limits --rate-style full
+# Moderate: 30% used, 2h elapsed (40%) → pace = 30*5/2 = 75% → yellow
 printf '  %-20s' "Moderate pace:"
-# 40% used, 2.5h left of 5h → pace ~80%
-_run "$(_mock_json 200000 65000 40 30 9000 518400)" --segments rate_limits --rate-style full
+_run "$(_mock_json 200000 65000 30 20 10800 518400)" --segments rate_limits --rate-style full
+# High: 55% used, 2h elapsed (40%) → pace = 55*5/2 = 137% → clamped to 100 → red
 printf '  %-20s' "High pace (danger):"
-# 50% used, 4h left of 5h → pace 250%
-_run "$(_mock_json 200000 65000 50 10 14400 561600)" --segments rate_limits --rate-style full
+_run "$(_mock_json 200000 65000 55 15 10800 561600)" --segments rate_limits --rate-style full
 
-# All Segments
+# All Segments (with project added)
 _header "All Segments"
-for seg in directory context_bar context_pct model cost rate_limits vim_mode worktree session_time lines_changed; do
+for seg in project directory context_bar context_pct model cost rate_limits vim_mode worktree session_time lines_changed; do
   printf '  %-16s' "$seg:"
   _run "$(_mock_json)" --segments "$seg"
 done
@@ -111,10 +132,12 @@ done
 # Example Configs
 _header "Example Configs"
 printf '  %-13s' "Minimal:"
-echo "statusline.sh --segments directory,context_bar"
+echo "statusline.sh --segments project,context_bar"
 printf '  %-13s' "Full:"
-echo "statusline.sh --segments directory,context_bar,model,cost,rate_limits --rate-style dot"
+echo "statusline.sh --segments project,directory,context_bar,cost,rate_limits --theme neon --icons nerd --rate-style full"
 printf '  %-13s' "Developer:"
-echo "statusline.sh --segments directory,context_bar,model,lines_changed,session_time"
+echo "statusline.sh --segments project,directory,context_bar,lines_changed,session_time"
+printf '  %-13s' "Plain:"
+echo "statusline.sh --icons none --no-color"
 
 echo ""
