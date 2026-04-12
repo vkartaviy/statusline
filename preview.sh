@@ -57,7 +57,7 @@ if [ -n "$_PREVIEW_THEME" ]; then
   exit 0
 fi
 
-segs="${_PREVIEW_SEGMENTS:-project,directory,context_bar,cost}"
+segs="${_PREVIEW_SEGMENTS:-project,directory,worktree,context_bar,cost}"
 
 # Themes
 _header "Themes"
