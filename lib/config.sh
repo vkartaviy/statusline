@@ -80,7 +80,7 @@ cc_load_config() {
       _ICON_DIR="$(printf '\xef\x81\xbc') "       # U+F07C folder-open
       _ICON_MODEL="$(printf '\xef\x8b\x9b') "     # U+F2DB microchip
       _ICON_COST="$(printf '\xee\xb7\xa8') "       # U+EDE8
-      _ICON_WORKTREE="$(printf '\xef\x90\x98') "   # U+F418
+      _ICON_WORKTREE="$(printf '\xf3\xb0\x98\xac') "   # U+F062C
       _ICON_TIME="$(printf '\xef\x80\x97') "       # U+F017 clock
       _ICON_RESET="$(printf '\xee\xab\x92') "       # U+EAD2
       _ICON_PROJECT="$(printf '\xee\xad\x84') "   # U+EB44 bracket
