@@ -34,22 +34,7 @@ OPTIONS
                         Default: nerd
   --no-icons            Alias for --icons none
   --no-color            Disable all ANSI (forces monochrome theme)
-  --config PATH         Config file path
-                        Default: ~/.config/claude-statusline/config
   --help                Show this help
-
-CONFIG FILE
-  Path: ~/.config/claude-statusline/config
-  Format (one KEY=VALUE per line):
-    SEGMENTS=directory,context_bar,model
-    THEME=default
-    BAR_WIDTH=20
-    BAR_STYLE=block
-    SEPARATOR= |
-    RATE_STYLE=compact
-    ICONS=nerd
-
-  Priority: CLI flags > config file > built-in defaults
 
 SEGMENTS
   project         Project root name

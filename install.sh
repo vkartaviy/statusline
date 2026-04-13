@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# install.sh — symlink to ~/.local/bin/ + copy default config
+# install.sh — symlink to ~/.local/bin/
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN_DIR="${HOME}/.local/bin"
-CONFIG_DIR="${HOME}/.config/claude-statusline"
 
 echo "claude-statusline installer"
 echo "─────────────────────────────"
@@ -25,31 +24,6 @@ else
   echo "Creating symlink: ${LINK}"
 fi
 ln -s "${SCRIPT_DIR}/statusline.sh" "$LINK"
-
-# Config
-if [ ! -d "$CONFIG_DIR" ]; then
-  echo "Creating config directory: ${CONFIG_DIR}"
-  mkdir -p "$CONFIG_DIR"
-fi
-
-CONFIG_FILE="${CONFIG_DIR}/config"
-if [ ! -f "$CONFIG_FILE" ]; then
-  echo "Writing default config: ${CONFIG_FILE}"
-  cat > "$CONFIG_FILE" << 'EOF'
-# claude-statusline config
-# See: claude-statusline --help
-
-SEGMENTS=directory,context_bar
-THEME=default
-BAR_WIDTH=30
-BAR_STYLE=block
-SEPARATOR= |
-RATE_STYLE=compact
-ICONS=1
-EOF
-else
-  echo "Config exists, skipping: ${CONFIG_FILE}"
-fi
 
 echo ""
 echo "Done! Add to your Claude Code settings (~/.claude/settings.json):"

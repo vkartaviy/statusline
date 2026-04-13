@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# config.sh — defaults, config file loading, CLI flag parsing
+# config.sh — defaults + CLI flag parsing
 
 cc_load_config() {
   # ── Built-in defaults ──
@@ -11,42 +11,9 @@ cc_load_config() {
   _CFG_RATE_STYLE="compact"
   _CFG_ICON_STYLE="nerd"
   _CFG_NO_COLOR=0
-  _CFG_CONFIG="${HOME}/.config/claude-statusline/config"
   _CFG_SHOW_HELP=0
 
-  # ── Source config file (if exists) ──
-  # Parse CLI first pass: find --config flag
-  local i
-  for ((i=1; i<=$#; i++)); do
-    local arg="${!i}"
-    if [ "$arg" = "--config" ]; then
-      local next=$((i+1))
-      _CFG_CONFIG="${!next}"
-    fi
-  done
-
-  if [ -f "$_CFG_CONFIG" ]; then
-    local line key val
-    while IFS= read -r line || [ -n "$line" ]; do
-      # Skip comments and empty lines
-      case "$line" in
-        '#'*|'') continue ;;
-      esac
-      key="${line%%=*}"
-      val="${line#*=}"
-      case "$key" in
-        SEGMENTS)   _CFG_SEGMENTS="$val" ;;
-        THEME)      _CFG_THEME="$val" ;;
-        BAR_WIDTH)  _CFG_BAR_WIDTH="$val" ;;
-        BAR_STYLE)  _CFG_BAR_STYLE="$val" ;;
-        SEPARATOR)  _CFG_SEPARATOR="$val" ;;
-        RATE_STYLE) _CFG_RATE_STYLE="$val" ;;
-        ICONS)      _CFG_ICON_STYLE="$val" ;;
-      esac
-    done < "$_CFG_CONFIG"
-  fi
-
-  # ── Parse CLI flags (highest priority) ──
+  # ── Parse CLI flags ──
   while [ $# -gt 0 ]; do
     case "$1" in
       --segments)   _CFG_SEGMENTS="$2"; shift 2 ;;
@@ -58,7 +25,6 @@ cc_load_config() {
       --icons)      _CFG_ICON_STYLE="$2"; shift 2 ;;
       --no-icons)   _CFG_ICON_STYLE="none"; shift ;;
       --no-color)   _CFG_NO_COLOR=1; shift ;;
-      --config)     shift 2 ;;  # already handled
       --help)       _CFG_SHOW_HELP=1; shift ;;
       *)            shift ;;
     esac

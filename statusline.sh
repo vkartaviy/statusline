@@ -4,8 +4,14 @@
 
 set -f  # disable globbing (not needed, avoid surprises)
 
-# Resolve script directory (works through symlinks)
-_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Resolve script directory (follow symlinks first)
+_real_source="${BASH_SOURCE[0]}"
+while [ -L "$_real_source" ]; do
+  _link_dir="$(cd "$(dirname "$_real_source")" && pwd)"
+  _real_source="$(readlink "$_real_source")"
+  [[ "$_real_source" != /* ]] && _real_source="${_link_dir}/${_real_source}"
+done
+_SCRIPT_DIR="$(cd "$(dirname "$_real_source")" && pwd)"
 
 # ── Load core libraries ──
 . "${_SCRIPT_DIR}/lib/colors.sh"
