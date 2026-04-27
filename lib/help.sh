@@ -51,6 +51,8 @@ SEGMENTS
                   Example: $1.23
   rate_limits     API rate limit usage (see --rate-style)
                   Example: 5h:23% · 7d:41%
+  cache_health    Prompt cache hit ratio (warns on thrashing)
+                  Example: cache:92%   cache:miss
   vim_mode        Vim mode indicator
                   Example: NORMAL
   worktree        Git worktree name (hidden if not in worktree)
@@ -112,5 +114,6 @@ JSON INPUT
     .rate_limits.five_hour          5-hour rate limit (used_percentage, resets_at)
     .rate_limits.seven_day          7-day rate limit (used_percentage, resets_at)
     .vim.mode                       Vim mode (NORMAL/INSERT)
+    .session_id                     Session id (for cache_health state)
 HELPTEXT
 }

@@ -6,7 +6,7 @@ Configurable statusline for [Claude Code](https://docs.anthropic.com/en/docs/cla
 
 ## Features
 
-- **11 segments** — project, directory, context bar, context %, model, cost, rate limits, vim mode, worktree, session time, lines changed
+- **12 segments** — project, directory, context bar, context %, model, cost, rate limits, cache health, vim mode, worktree, session time, lines changed
 - **4 themes** — default (gradient), minimal, neon, monochrome
 - **4 bar styles** — block `■□`, shade `█░`, dot `●○`, ascii `#-`
 - **3 rate limit styles** — compact, dot, full (3-zone pace bar + countdown)
@@ -86,6 +86,7 @@ Config hierarchy: CLI flags > config file > built-in defaults.
 | `model` | `Opus 4.6 (1M context)` | Model display name |
 | `cost` | `$1.23` | Session cost (rounded to 2 decimals) |
 | `rate_limits` | `5h:23% · 7d:41%` | API rate limits (see rate styles) |
+| `cache_health` | `cache:92%` / `cache:miss` | Prompt cache hit ratio, warns on thrashing |
 | `vim_mode` | `NORMAL` | Vim mode indicator |
 | `worktree` | `feature-xyz` | Git worktree name (hidden if not in worktree) |
 | `session_time` | `12m 34s` | Session duration |
@@ -93,6 +94,16 @@ Config hierarchy: CLI flags > config file > built-in defaults.
 
 All segments read JSON from Claude Code stdin. The `directory` segment also checks the filesystem to detect sibling directories for smart path collapsing.
 Context bar auto-adapts to both 200K and 1M context windows.
+
+### Cache health
+
+The `cache_health` segment tracks the prompt cache hit ratio (`cache_read / (cache_read + cache_creation)`):
+
+- **`cache:92%`** in green — healthy, ~90% of input tokens hitting cache
+- **`cache:45%`** in red — poor hit rate, paying close to full input price
+- **`cache:miss`** in red — cache is thrashing (zero reads for 3+ consecutive refreshes)
+
+Per-session counters live in `$TMPDIR/claude-statusline/<session-id>.cache`. The first two refreshes are suppressed to avoid alarming readings before the cache has been built.
 
 ### Directory collapse
 

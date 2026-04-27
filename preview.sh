@@ -21,7 +21,7 @@ while [ $# -gt 0 ]; do
 done
 
 # ── Mock JSON generator ──
-# Args: ctx_size input_tokens rate_5h rate_7d reset_5h_offset reset_7d_offset project_dir current_dir
+# Args: ctx_size input_tokens rate_5h rate_7d reset_5h_offset reset_7d_offset project_dir current_dir cache_read cache_create session_id
 _mock_json() {
   local ctx_size="${1:-200000}"
   local input_tokens="${2:-65000}"
@@ -31,12 +31,15 @@ _mock_json() {
   local reset_7d_offset="${6:-345600}"
   local project_dir="${7:-/Users/vk/Dev/statusline}"
   local current_dir="${8:-$project_dir/segments}"
+  local cache_read="${9:-50000}"
+  local cache_create="${10:-10000}"
+  local session_id="${11:-preview}"
   local now=$(date +%s)
   local reset_5h=$((now + reset_5h_offset))
   local reset_7d=$((now + reset_7d_offset))
 
-  printf '{"model":{"display_name":"Opus 4.6"},"workspace":{"project_dir":"%s","current_dir":"%s","git_worktree":"feature-xyz"},"context_window":{"current_usage":{"input_tokens":%d,"cache_creation_input_tokens":10000,"cache_read_input_tokens":5000},"context_window_size":%d},"cost":{"total_cost_usd":13.50,"total_duration_ms":754000,"total_lines_added":156,"total_lines_removed":23},"rate_limits":{"five_hour":{"used_percentage":%s,"resets_at":%d},"seven_day":{"used_percentage":%s,"resets_at":%d}},"vim":{"mode":"NORMAL"}}' \
-    "$project_dir" "$current_dir" "$input_tokens" "$ctx_size" "$rate_5h" "$reset_5h" "$rate_7d" "$reset_7d"
+  printf '{"session_id":"%s","model":{"display_name":"Opus 4.6"},"workspace":{"project_dir":"%s","current_dir":"%s","git_worktree":"feature-xyz"},"context_window":{"current_usage":{"input_tokens":%d,"cache_creation_input_tokens":%d,"cache_read_input_tokens":%d},"context_window_size":%d},"cost":{"total_cost_usd":13.50,"total_duration_ms":754000,"total_lines_added":156,"total_lines_removed":23},"rate_limits":{"five_hour":{"used_percentage":%s,"resets_at":%d},"seven_day":{"used_percentage":%s,"resets_at":%d}},"vim":{"mode":"NORMAL"}}' \
+    "$session_id" "$project_dir" "$current_dir" "$input_tokens" "$cache_create" "$cache_read" "$ctx_size" "$rate_5h" "$reset_5h" "$rate_7d" "$reset_7d"
 }
 
 _header() {
@@ -122,9 +125,30 @@ _run "$(_mock_json 200000 65000 30 20 10800 518400)" --segments rate_limits --ra
 printf '  %-20s' "High pace (danger):"
 _run "$(_mock_json 200000 65000 55 15 10800 561600)" --segments rate_limits --rate-style full
 
+# Cache Health (4 stages — healthy / mid / poor / miss)
+_header "Cache Health"
+_cache_demo() {
+  local label="$1" sid="$2" read="$3" create="$4"
+  local state_file="${TMPDIR:-/tmp}/claude-statusline/${sid}.cache"
+  rm -f "$state_file" 2>/dev/null
+  local json
+  json=$(_mock_json 200000 65000 23 41 8040 345600 \
+    /Users/vk/Dev/statusline /Users/vk/Dev/statusline/segments \
+    "$read" "$create" "$sid")
+  printf '  %-22s' "$label"
+  # Run 3 times: healthy paths show on first call, "miss" only on third
+  _run "$json" --segments cache_health > /dev/null
+  _run "$json" --segments cache_health > /dev/null
+  _run "$json" --segments cache_health
+}
+_cache_demo "Healthy (90% hit):" health-90   90000 10000
+_cache_demo "Mid (60% hit):"     health-60   60000 40000
+_cache_demo "Poor (30% hit):"    health-30   30000 70000
+_cache_demo "Miss (thrashing):"  health-miss     0 50000
+
 # All Segments (with project added)
 _header "All Segments"
-for seg in project directory context_bar context_pct model cost rate_limits vim_mode worktree session_time lines_changed; do
+for seg in project directory context_bar context_pct model cost rate_limits cache_health vim_mode worktree session_time lines_changed; do
   printf '  %-16s' "$seg:"
   _run "$(_mock_json)" --segments "$seg"
 done

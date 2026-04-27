@@ -35,7 +35,8 @@ cc_parse_input() {
     (.rate_limits.five_hour.resets_at // -1),
     (.rate_limits.seven_day.used_percentage // -1),
     (.rate_limits.seven_day.resets_at // -1),
-    .vim.mode // ""
+    .vim.mode // "",
+    .session_id // ""
   ] | map(tostring) | join("\u001f")' 2>/dev/null) || return 1
 
   IFS="$_US" read -r \
@@ -44,6 +45,6 @@ cc_parse_input() {
     _CC_CTX_SIZE _CC_COST _CC_DURATION_MS \
     _CC_LINES_ADDED _CC_LINES_REMOVED \
     _CC_RATE_5H _CC_RATE_5H_RESET _CC_RATE_7D _CC_RATE_7D_RESET \
-    _CC_VIM_MODE \
+    _CC_VIM_MODE _CC_SESSION_ID \
     <<< "$parsed"
 }

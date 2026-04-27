@@ -40,7 +40,7 @@ cc_load_config() {
   esac
 
   # ── Resolve icon characters from style ──
-  _ICON_DIR="" _ICON_MODEL="" _ICON_COST="" _ICON_WORKTREE="" _ICON_TIME="" _ICON_RESET="⟳" _ICON_PROJECT=""
+  _ICON_DIR="" _ICON_MODEL="" _ICON_COST="" _ICON_WORKTREE="" _ICON_TIME="" _ICON_RESET="⟳" _ICON_PROJECT="" _ICON_CACHE=""
   case "$_CFG_ICON_STYLE" in
     nerd)
       _ICON_DIR="$(printf '\xef\x81\xbc') "       # U+F07C folder-open
@@ -50,6 +50,7 @@ cc_load_config() {
       _ICON_TIME="$(printf '\xef\x80\x97') "       # U+F017 clock
       _ICON_RESET="$(printf '\xee\xab\x92') "       # U+EAD2
       _ICON_PROJECT="$(printf '\xee\xad\x84') "   # U+EB44 bracket
+      _ICON_CACHE="$(printf '\xef\x92\x9b') "      # U+F49B nf-mdi-database
       ;;
     unicode)
       _ICON_DIR="› "
@@ -59,6 +60,7 @@ cc_load_config() {
       _ICON_TIME="◷ "
       _ICON_RESET="◷"
       _ICON_PROJECT="◆ "
+      _ICON_CACHE="◫ "
       ;;
     none) ;;
     *)
