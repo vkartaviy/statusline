@@ -5,7 +5,8 @@ cc_load_config() {
   # ── Built-in defaults ──
   _CFG_SEGMENTS="directory,context_bar"
   _CFG_THEME="default"
-  _CFG_BAR_WIDTH=20
+  _CFG_BAR_WIDTH=10
+  _CFG_RATE_BAR_WIDTH=5
   _CFG_BAR_STYLE="block"
   _CFG_SEPARATOR=" | "
   _CFG_RATE_STYLE="compact"
@@ -19,6 +20,7 @@ cc_load_config() {
       --segments)   _CFG_SEGMENTS="$2"; shift 2 ;;
       --theme)      _CFG_THEME="$2"; shift 2 ;;
       --bar-width)  _CFG_BAR_WIDTH="$2"; shift 2 ;;
+      --rate-bar-width) _CFG_RATE_BAR_WIDTH="$2"; shift 2 ;;
       --bar-style)  _CFG_BAR_STYLE="$2"; shift 2 ;;
       --separator)  _CFG_SEPARATOR="$2"; shift 2 ;;
       --rate-style) _CFG_RATE_STYLE="$2"; shift 2 ;;

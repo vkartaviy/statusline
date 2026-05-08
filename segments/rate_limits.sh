@@ -81,7 +81,7 @@ _rate_countdown() {
 _rate_bar() {
   local used_pct="$1"
   local pace="${2:-$used_pct}"  # projected usage at end of window
-  local width=8
+  local width="${_CFG_RATE_BAR_WIDTH:-5}"
 
   # Remaining blocks (current)
   local remain=$((100 - used_pct))

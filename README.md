@@ -64,7 +64,8 @@ bash statusline.sh [OPTIONS]
 | `--segments LIST` | `directory,context_bar` | Comma-separated segment names |
 | `--theme NAME` | `default` | Theme: `default`, `minimal`, `neon`, `monochrome` |
 | `--icons STYLE` | `nerd` | Icon set: `nerd`, `unicode`, `none`, or custom |
-| `--bar-width N` | `20` | Bar width in characters |
+| `--bar-width N` | `10` | Context bar width in characters |
+| `--rate-bar-width N` | `5` | Rate limit bar width in characters |
 | `--bar-style STYLE` | `block` | Bar style: `block`, `shade`, `dot`, `ascii` |
 | `--separator STR` | ` \| ` | String between segments |
 | `--rate-style STYLE` | `compact` | Rate display: `compact`, `dot`, `full` |
@@ -81,7 +82,7 @@ Config hierarchy: CLI flags > config file > built-in defaults.
 |---------|--------|-------------|
 | `project` | `statusline` | Project root name |
 | `directory` | `apps/web/src` | Path relative to project, smart collapse |
-| `context_bar` | `■■■■■■□□□□□□□□ 42%` | Context window usage bar |
+| `context_bar` | `■■■■□□□□□□ 42%` | Context window usage bar |
 | `context_pct` | `42%` | Context percentage only |
 | `model` | `Opus 4.6 (1M context)` | Model display name |
 | `cost` | `$1.23` | Session cost (rounded to 2 decimals) |
@@ -139,7 +140,7 @@ The `directory` segment shows your path relative to the project root. Long paths
 |----------------|--------|-------------|
 | `compact` | `5h:23% · 7d:41%` | Percentage used |
 | `dot` | `●` | Single colored dot |
-| `full` | `5h ■■■■▪▪□□ 77% ⟳2h · 7d ■■▪▪□□□□ 59% ⟳4d` | 3-zone bar + countdown |
+| `full` | `5h ■■▪□□ 77% ⟳2h · 7d ■▪□□□ 59% ⟳4d` | 3-zone bar + countdown |
 
 ### Pace-based coloring
 

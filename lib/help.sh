@@ -22,8 +22,10 @@ OPTIONS
                         Default: directory,context_bar
   --theme NAME          Color theme: default, minimal, neon, monochrome
                         Default: default
-  --bar-width N         Bar width in characters (context_bar + rate bar)
-                        Default: 20
+  --bar-width N         Context bar width in characters
+                        Default: 10
+  --rate-bar-width N    Rate limit bar width in characters
+                        Default: 5
   --bar-style STYLE     Bar characters: block, shade, dot, ascii
                         Default: block
   --separator STR       String between segments
