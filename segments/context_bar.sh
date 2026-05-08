@@ -24,8 +24,8 @@ segment_context_bar() {
     color="$_THEME_BAR_CRIT"
   fi
 
-  # Build bar
-  local filled=$((pct * _CFG_BAR_WIDTH / 100))
+  # Build bar (round to nearest, not truncate — matters at small widths)
+  local filled=$(((pct * _CFG_BAR_WIDTH + 50) / 100))
   local empty=$((_CFG_BAR_WIDTH - filled))
 
   local bar=""

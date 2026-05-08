@@ -92,9 +92,10 @@ _rate_bar() {
   [ "$proj_remain" -lt 0 ] && proj_remain=0
   [ "$proj_remain" -gt "$remain" ] && proj_remain="$remain"
 
-  # Three zones in blocks
-  local safe_blocks=$((proj_remain * width / 100))
-  local total_remain_blocks=$((remain * width / 100))
+  # Three zones in blocks (round to nearest, not truncate — matters at small widths)
+  local safe_blocks=$(((proj_remain * width + 50) / 100))
+  local total_remain_blocks=$(((remain * width + 50) / 100))
+  [ "$safe_blocks" -gt "$total_remain_blocks" ] && safe_blocks="$total_remain_blocks"
   local pace_blocks=$((total_remain_blocks - safe_blocks))
   local used_blocks=$((width - total_remain_blocks))
 
